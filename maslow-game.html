@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Maslow's Hierarchy Quest - Multi-Level</title>
+  <style>
+    /* Reset và box sizing */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0; padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.5rem 0 3rem;
+    }
+    header {
+      background: rgba(255 255 255 / 0.15);
+      backdrop-filter: blur(10px);
+      color: #fff;
+      width: 100%;
+      max-width: 600px;
+      font-weight: 700;
+      font-size: 1.8rem;
+      text-align: center;
+      padding: 1.2rem 0;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgb(0 0 0 / 0.2);
+      margin-bottom: 1.8rem;
+      user-select: none;
+    }
+    main {
+      background: #fff;
+      max-width: 600px;
+      width: 95vw;
+      border-radius: 16px;
+      padding: 1.5rem 2rem 2rem;
+      box-shadow: 0 10px 30px rgb(0 0 0 / 0.2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      user-select: none;
+    }
+    .level-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #5a2a83;
+      margin-bottom: 0.4rem;
+      text-align: center;
+    }
+    .instructions {
+      font-size: 1rem;
+      color: #7a6f9b;
+      font-weight: 600;
+      margin-bottom: 1.2rem;
+      text-align: center;
+      line-height: 1.3;
+      min-height: 3.5em;
+    }
+    .timer {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #a94aad;
+      margin-bottom: 1.5rem;
+      user-select: text;
+    }
+    .game-area {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(85px, 1fr));
+      gap: 16px;
+      background: #f8f6ff;
+      padding: 1rem 1rem 1.5rem;
+      border-radius: 14px;
+      border: 2px solid #a270d6;
+      box-shadow: inset 0 0 10px rgb(162 114 214 / 0.2);
+      min-height: 210px;
+      user-select: none;
+    }
+    .item {
+      background: #e9e5ff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgb(98 81 174 / 0.2);
+      color: #5a2a83;
+      font-weight: 700;
+      font-size: 0.9rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 85px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+      padding: 0 6px;
+      text-align: center;
+      user-select: none;
+    }
+    .item:hover:not(.collected) {
+      background-color: #6f56bd;
+      color: #fff;
+      box-shadow: 0 6px 18px rgb(111 86 189 / 0.7);
+    }
+    .collected {
+      background-color: #56b36f !important;
+      color: #fff !important;
+      cursor: default;
+      box-shadow: 0 0 15px #4ba362;
+    }
+    .button-group {
+      display: flex;
+      gap: 16px;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+    }
+    button {
+      flex: 1 1 140px;
+      min-width: 120px;
+      padding: 0.65rem 1rem;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, #7e57c2, #512da8);
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 6px 14px rgb(81 45 168 / 0.6);
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.3s ease;
+    }
+    button:hover:not(:disabled) {
+      background: linear-gradient(135deg, #673ab7, #311b92);
+      box-shadow: 0 8px 18px rgb(49 27 146 / 0.8);
+    }
+    button:disabled {
+      background: #b1a3d4;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .status {
+      margin-top: 1.5rem;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #a94aad;
+      min-height: 1.6em;
+      text-align: center;
+      user-select: none;
+      min-width: 280px;
+    }
+
+    /* Responsive text size */
+    @media (max-width: 400px) {
+      .level-title {
+        font-size: 1.3rem;
+      }
+      .instructions {
+        font-size: 0.9rem;
+      }
+      .item {
+        font-size: 0.8rem;
+        height: 70px;
+      }
+      button {
+        min-width: 100px;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>Maslow's Hierarchy Quest - Multi-Level</header>
+  <main>
+    <div class="level-title" id="levelTitle">Level 1: Nhu cầu sinh lý</div>
+    <div class="instructions" id="instructions">
+      Thu thập đủ Thức ăn, Nước uống, và Chỗ ngủ trong 5 giây! Chỉ được phép nhấp sai tối đa 2 lần. Tránh vật phẩm giả!
+    </div>
+    <div class="timer" id="timer">Thời gian còn lại: 5s</div>
+    <div class="game-area" id="gameArea"></div>
+
+    <div class="button-group">
+      <button id="prevBtn" disabled>Level trước</button>
+      <button id="retryBtn">Chơi lại</button>
+      <button id="nextBtn" disabled>Level tiếp theo</button>
+    </div>
+
+    <div class="status" id="status"></div>
+  </main>
+
+<script>
+  const levels = [
+    {
+      title: "Level 1: Nhu cầu sinh lý",
+      instructions: "Thu thập đủ Thức ăn, Nước uống, và Chỗ ngủ trong 5 giây! Chỉ được phép nhấp sai tối đa 2 lần. Tránh vật phẩm giả!",
+      neededItems: ["Thức ăn", "Nước uống", "Chỗ ngủ"],
+      fakeItems: ["Rác", "Đồ hỏng", "Vật phẩm giả", "Đồ vỡ", "Mảnh vụn", "Rác thải", "Đồ lỗi", "Mẩu giấy"],
+      timeLimit: 5,
+      maxWrongClicks: 2,
+    },
+    {
+      title: "Level 2: Nhu cầu an toàn",
+      instructions: "Thu thập đủ Nhà cửa, Thu nhập ổn định, và Bảo hiểm trong 5 giây! Sai tối đa 3 lần.",
+      neededItems: ["Nhà cửa", "Thu nhập ổn định", "Bảo hiểm"],
+      fakeItems: ["Thất nghiệp", "Nợ nần", "Nguy hiểm", "Rủi ro", "Bất an", "Rác", "Đồ hỏng"],
+      timeLimit: 5,
+      maxWrongClicks: 3,
+    },
+    {
+      title: "Level 3: Nhu cầu xã hội",
+      instructions: "Thu thập đủ Gia đình, Bạn bè, và Tình yêu trong 5 giây! Sai tối đa 3 lần.",
+      neededItems: ["Gia đình", "Bạn bè", "Tình yêu"],
+      fakeItems: ["Cô đơn", "Mâu thuẫn", "Cãi vã", "Ghét bỏ", "Lừa dối", "Rác"],
+      timeLimit: 5,
+      maxWrongClicks: 3,
+    },
+    {
+      title: "Level 4: Nhu cầu được tôn trọng",
+      instructions: "Thu thập đủ Danh tiếng, Địa vị, và Sự công nhận trong 5 giây! Sai tối đa 4 lần.",
+      neededItems: ["Danh tiếng", "Địa vị", "Sự công nhận"],
+      fakeItems: ["Bị coi thường", "Bị chê bai", "Thất bại", "Bị lãng quên", "Rác"],
+      timeLimit: 5,
+      maxWrongClicks: 4,
+    },
+    {
+      title: "Level 5: Nhu cầu tự thể hiện bản thân",
+      instructions: "Thu thập đủ Sáng tạo, Thành tựu, và Tự do trong 5 giây! Sai tối đa 4 lần.",
+      neededItems: ["Sáng tạo", "Thành tựu", "Tự do"],
+      fakeItems: ["Sự hạn chế", "Thất bại", "Sự ép buộc", "Rác"],
+      timeLimit: 5,
+      maxWrongClicks: 4,
+    }
+  ];
+
+  const gameArea = document.getElementById('gameArea');
+  const timerEl = document.getElementById('timer');
+  const retryBtn = document.getElementById('retryBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const prevBtn = document.getElementById('prevBtn');
+  const statusEl = document.getElementById('status');
+  const levelTitle = document.getElementById('levelTitle');
+  const instructions = document.getElementById('instructions');
+
+  let currentLevel = 0;
+  let collected = [];
+  let wrongClicks = 0;
+  let timerInterval;
+  let timeLeft = 5;
+
+  function shuffleArray(arr) {
+    return arr
+      .map(value => ({ value, sort: Math.random() }))
+      .sort((a,b) => a.sort - b.sort)
+      .map(({value}) => value);
+  }
+
+  function createItem(name, isFake) {
+    const div = document.createElement('div');
+    div.classList.add('item');
+    div.textContent = name;
+    // màu nền đồng nhất để chuyên nghiệp
+    // đổi màu khi collected hoặc sai
+
+    div.addEventListener('click', () => {
+      if (collected.includes(name) || timeLeft <= 0) return; // tránh nhấp nhiều lần
+
+      if (!isFake) {
+        collected.push(name);
+        div.classList.add('collected');
+        div.style.pointerEvents = 'none';
+        checkWin();
+      } else {
+        wrongClicks++;
+        // nháy đỏ nhẹ khi sai
+        div.style.backgroundColor = '#e57373';
+        div.style.color = '#fff';
+        setTimeout(() => {
+          div.style.backgroundColor = '';
+          div.style.color = '';
+        }, 350);
+
+        if (wrongClicks > levels[currentLevel].maxWrongClicks) {
+          endGame(false, `Bạn đã nhấp sai quá số lần cho phép! Bạn thua.`);
+        }
+      }
+    });
+
+    return div;
+  }
+
+  function loadGame() {
+    clearInterval(timerInterval);
+    collected = [];
+    wrongClicks = 0;
+    timeLeft = levels[currentLevel].timeLimit;
+
+    levelTitle.textContent = levels[currentLevel].title;
+    instructions.textContent = levels[currentLevel].instructions;
+    timerEl.textContent = `Thời gian còn lại: ${timeLeft}s`;
+    statusEl.textContent = '';
+    nextBtn.disabled = true;
+    retryBtn.disabled = true;
+    prevBtn.disabled = currentLevel === 0;
+
+    gameArea.innerHTML = '';
+
+    const {neededItems, fakeItems} = levels[currentLevel];
+    const totalItems = 12;
+
+    // lấy đủ thật cần có
+    const trueItems = neededItems.slice();
+
+    // thêm fake cho đủ 12 thẻ
+    const neededFakeCount = totalItems - trueItems.length;
+    const shuffledFake = shuffleArray(fakeItems);
+    const fakeToUse = shuffledFake.slice(0, neededFakeCount);
+
+    // Trộn chung thật + giả
+    const allItems = shuffleArray([
+      ...trueItems.map(name => ({name, isFake: false})),
+      ...fakeToUse.map(name => ({name, isFake: true}))
+    ]);
+
+    allItems.forEach(({name, isFake}) => {
+      const item = createItem(name, isFake);
+      gameArea.appendChild(item);
+    });
+
+    retryBtn.disabled = false;
+
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      timerEl.textContent = `Thời gian còn lại: ${timeLeft}s`;
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        endGame(false, "Hết thời gian! Bạn đã thua!");
+      }
+    }, 1000);
+  }
+
+  function checkWin() {
+    const needed = levels[currentLevel].neededItems;
+    const allCollected = needed.every(item => collected.includes(item));
+    if (allCollected) {
+      endGame(true, "Chúc mừng! Bạn đã hoàn thành level này!");
+    }
+  }
+
+  function endGame(win, message) {
+    clearInterval(timerInterval);
+    statusEl.textContent = message;
+    retryBtn.disabled = false;
+    nextBtn.disabled = !win || currentLevel >= levels.length -1;
+  }
+
+  retryBtn.addEventListener('click', loadGame);
+
+  nextBtn.addEventListener('click', () => {
+    if (currentLevel < levels.length -1) {
+      currentLevel++;
+      loadGame();
+    }
+  });
+
+  prevBtn.addEventListener('click', () => {
+    if (currentLevel > 0) {
+      currentLevel--;
+      loadGame();
+    }
+  });
+
+  loadGame();
+</script>
+</body>
+</html>
